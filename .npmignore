@@ -1,0 +1,8 @@
+*.config.ts
+tsconfig.json
+.gitignore
+.vscode
+src
+__mocks__
+__tests__
+*.tgz
