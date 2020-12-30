@@ -3,9 +3,9 @@ import { allRoutes } from "../src/_globals";
 
 //Mocking the glob(https://www.npmjs.com/package/glob) package
 const glob = {
-    //returns all mock routes from "src/_globals" with given extension
+    //returns all mock routes from "src/_globals" appending the given extension
     sync: (pathWithExtenstion: string, _options: object): string[] => {
-        //Getting the extension from given glob pattern(**/*.extension)
+        //Extracting the extension from given glob pattern(**/*.extension)
         let extensionArray = pathWithExtenstion.match(extensionMatcher);
 
         //If extension was given

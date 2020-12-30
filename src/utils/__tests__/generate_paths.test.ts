@@ -1,4 +1,4 @@
-import generateParams from "../generate_params";
+import generatePaths from "../generate_paths";
 import { pathsType } from "../../types";
 
 const argumentRoutes: string[] = [
@@ -25,6 +25,6 @@ const returnedPaths: pathsType = [
     }
 ];
 
-test("Testing generateParams function", () => {
-    expect(generateParams(argumentRoutes)).toEqual(returnedPaths);
+test("Testing generatePaths method", () => {
+    expect(generatePaths(argumentRoutes)).toEqual(returnedPaths);
 });

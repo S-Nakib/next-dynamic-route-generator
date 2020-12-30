@@ -1,6 +1,6 @@
 import { pathsType } from "../types";
 
-const generateParams = (allRoutes: string[]): pathsType => {
+const generatePaths = (allRoutes: string[]): pathsType => {
     let paths: pathsType = [];
 
     allRoutes.forEach((path) => {
@@ -14,4 +14,4 @@ const generateParams = (allRoutes: string[]): pathsType => {
     return paths;
 };
 
-export default generateParams;
+export default generatePaths;
