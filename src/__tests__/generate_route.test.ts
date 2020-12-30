@@ -62,7 +62,8 @@ describe("Testing parameter validation for first parameter", () => {
         ).toThrow();
     });
 
-    //'slug' should be an array. But it is not possible in javascript to check if a variable is array. We can only check if it is an object.
+    //'slug' should be an array. But it is not possible in javascript to check if a variable is array.
+    // We can only check if it is an object.
     test("Passing an object where slug is not an object", () => {
         expect(() =>
             generateRoute(({ params: { slug: 3 } } as unknown) as pathType)

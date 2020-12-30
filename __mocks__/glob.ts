@@ -8,9 +8,9 @@ const glob = {
         //Extracting the extension from given glob pattern(**/*.extension)
         let extensionArray = pathWithExtenstion.match(extensionMatcher);
 
-        //If extension was given
-        if (extensionArray && extensionArray.length !== 0) {
-            //The extensionArray should contain at most one element
+        //The extension array will never be null, the if condition is for narrowing the type..
+        if (extensionArray) {
+            //The extensionArray will contain at most one element
             const extension = extensionArray[0];
 
             //generating files of given extension from the allRoutes

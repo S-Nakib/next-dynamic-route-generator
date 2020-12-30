@@ -45,7 +45,8 @@ describe("Parameter validation testing", () => {
 import getAllRoutes from "../utils/get_all_routes";
 import generatePaths from "../utils/generate_paths";
 
-//This will be returned by getAllRoutesMock. We will check later if generatePathsMock is called by this value
+//This will be returned by Mock getAllRoutes.
+//We will check later if the Mock generatePaths is called by this value
 const getAllRoutesReturns = ["index", "posts/about"];
 
 jest.mock("fs");

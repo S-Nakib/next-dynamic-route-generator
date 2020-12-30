@@ -44,7 +44,8 @@ export default getPaths;
 
 //generates route from given 'path'.
 export const generateRoute = (path: pathType, extension?: string): string => {
-    //Handling error for first argument. Here, 'slug' should be an array. But it is not possible in javascript to check if a variable is array. We can only check if it is an object.
+    //Handling error for first argument. Here, 'slug' should be an array. But it is not possible in
+    //javascript to check if a variable is array. We can only check if it is an object.
     if (
         typeof path === "object" &&
         "params" in path &&

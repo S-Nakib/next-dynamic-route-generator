@@ -48,10 +48,10 @@ The project file structure is something like this. (You may replace the `.js` to
 Now you want the URL of the site to be the same as `posts` directory structure. That is...
 
 <pre>
-your_url.domain/about
-               /cpp/introduction  
-               /javascript/asynchronous_javascript  
-                          /nodejs/nodejs_architecture
+your_domain/about
+           /cpp/introduction  
+           /javascript/asynchronous_javascript  
+                      /nodejs/nodejs_architecture
  </pre>
 
 So you need to use [getStaticPaths](https://nextjs.org/docs/basic-features/data-fetching#getstaticpaths-static-generation) to generate those paths statically.

@@ -7,3 +7,4 @@ src
 __mocks__
 __tests__
 *.tgz
+*.md
