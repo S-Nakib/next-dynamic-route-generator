@@ -1,4 +1,4 @@
-![version1.1.0](https://img.shields.io/badge/version-1.1.0-green) ![contributions:welcome](https://img.shields.io/badge/contributions-welcome-red)
+![version1.1.0](https://img.shields.io/badge/version-1.1.1-green) ![contributions:welcome](https://img.shields.io/badge/contributions-welcome-red)
 <br/>
 
 # Installation
