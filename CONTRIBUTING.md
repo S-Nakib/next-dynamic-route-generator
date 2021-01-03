@@ -15,7 +15,7 @@ We use github to host code, to track issues and feature requests, as well as acc
 
 Pull requests are the best way to propose changes to the codebase (we use [Github Flow](https://guides.github.com/introduction/flow/index.html)). We actively welcome your pull requests:
 
--   Fork the repo and create your branch from `master`.
+-   Fork the repo and create your branch from `main` branch.
 -   Code should be written in typescript with comments.
 -   Namings should be on camelCase following the naming conventions.
 -   If you've added code that should be tested, add tests.

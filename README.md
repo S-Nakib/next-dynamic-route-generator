@@ -1,4 +1,4 @@
-![version1.1.0](https://img.shields.io/badge/version-1.1.1-green) ![contributions:welcome](https://img.shields.io/badge/contributions-welcome-red)
+![version2.0.0](https://img.shields.io/badge/version-2.0.0-green) ![contributions:welcome](https://img.shields.io/badge/contributions-welcome-red)
 <br/>
 
 # Installation
@@ -25,7 +25,7 @@ From here we are assuming that you are familiar with `next.js`. You need not be 
 
 `paths`: The same as [paths](https://nextjs.org/docs/basic-features/data-fetching#the-paths-key-required) of `next.js`. It is an array.
 
-`path`: The elements of `paths` array.
+`params`: The [params](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation) key of the parameter of `getStaticProps`.
 
 `route`: The url string. Such as `"about/about_me"`
 
@@ -59,9 +59,10 @@ So you need to use [getStaticPaths](https://nextjs.org/docs/basic-features/data-
 The returned object of the [getStaticPaths](https://nextjs.org/docs/basic-features/data-fetching#getstaticpaths-static-generation) must contain a key named as [paths](https://nextjs.org/docs/basic-features/data-fetching#the-paths-key-required). This key is an array defining the route/URL structure of the site. Since you want the route/URL structure to be the same as the `posts` directory structure, you need to pass the [paths](https://nextjs.org/docs/basic-features/data-fetching#the-paths-key-required) key accordingly.  
 And here comes `next-dynamic-route-generator` to rescue you. It provides a method `getPaths` which will generate the `paths` key for you. You just need to point out the directory where you have kept your contents and the file extension of your contents. This method is described [here](#getpaths).
 
-You will also need to work with [getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation) method, which takes a parameter of the same type as elements of the `paths` array. Here the whole array won't be passed at once but each element at a time.
+You will also need to work with [getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation) method. The `getStaticProps` method takes a parameter which has a [params](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation) key.
 
-On `getStaticProps`, you need to fetch the `.md` files. But here you don't have the file routes but an object containing `params` key which you get as a parameter. Here also we have got your back. Just pass the parameter you get on `getStaticProps` as it is to the method `generateRoute` which will return the `route` string without any extension.
+From the params key you can get the current route and then fetch the contents(.md/.mdx or other files). Here also we have got your back. If the params key is not `undefined`, pass it to the `generateRoute` method and it will return the route string.
+
 You can also pass an optional second argument string defining the extension of your files to get the route with the extension. This method is described [here](#generateroute).
 
 ### By the way, to make `generateRoute` work on `getStaticProps`, you have to use `getPaths` on `getStaticPaths`.
@@ -93,8 +94,6 @@ That means the all the contents files should be either `.md` or `.mdx` or any ot
 This will prevent duplication of elements of the `paths` key. But still, if you want to do otherwise then you will need to call `getPaths` more than once and handle duplication on your own.
 The static files which will not be converted to URL such as image, etc can have any extension since they will not generate any route.
 
-Here if you create a file named as `index`(i.e. `index.md` here) in a subdirectory then it will be as `/` in the site.
-
 <br/><br/>
 
 <h1 id="getpaths">getPaths</h1>
@@ -116,16 +115,18 @@ const paths = getPaths("posts/javascript", "md");
 
 <h1 id="generateroute">generateRoute</h1>
 
-Pass the parameter of `getStaticProps` directly(without any destructuring) to the `generateRoute` method. It will return the `route` as a string. You can also pass an optional parameter extension to get the route with the extension. Without passing an extension, you will get the route without an extension.
+If the `params` key exists on the paramater of `getStaticProps`, then pass the `params` key to the `generateRoute` method. It will return the `route` as a string. You can also pass an optional parameter extension to get the route with the extension. Without passing an extension, you will get the route without an extension.
 
 ```javascript
-export async function getStaticProps(data) {
-    const route = generateRoute(data, "md");
+export async function getStaticProps(context) {
+    if (context.params) {
+        const route = generateRoute(data, "md");
+    }
 }
 ```
 
 ### Error handling
 
-The `getStaticPaths` and `getStaticProps` methods are called only at the time of building the static site. They are not something like `express.js`s middleware functions, which run for each request.
-So, it is not suitable to catch the error and let it go. Rather the user should be shown directly if anything wrong happens so that the user can take measures and build the site perfectly.
+The `getStaticPaths` and `getStaticProps` methods are called only at the time of building the static site. They are not something like `express.js`s middleware functions, which run for each API request.
+So, it is not suitable to catch the error and let it go. Rather the user/develper should be shown directly if anything wrong happens so that he can take measures and build the site perfectly.
 So, here we have validated the user input(method arguments) and thrown error with an error message so that the user can easily catch what has gone wrong.

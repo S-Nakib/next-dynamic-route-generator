@@ -1,13 +1,15 @@
 import getAllRoutes from "./utils/get_all_routes";
 import generatePaths from "./utils/generate_paths";
-import { pathType, pathsType } from "./types";
+import { paramsType, pathsType } from "./types";
 
 /*
 Definitions: 
 
-paths: The 'paths' key of next.js(https://nextjs.org/docs/basic-features/data-fetching#the-paths-key-required). It is an array.
+paths: The 'paths' key of next.js. It is an array.
+(https://nextjs.org/docs/basic-features/data-fetching#the-paths-key-required). 
 
-path: The elements of 'paths' array. 
+params: The 'params' key of parameter of 'getStaticProps'.
+https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation
 
 route: The url string. Such as "about/about_me"
 
@@ -42,21 +44,27 @@ const getPaths = (dir: string, extension: string): pathsType => {
 
 export default getPaths;
 
-//generates route from given 'path'.
-export const generateRoute = (path: pathType, extension?: string): string => {
-    //Handling error for first argument. Here, 'slug' should be an array. But it is not possible in
-    //javascript to check if a variable is array. We can only check if it is an object.
+//generates route from given 'params' key.
+export const generateRoute = (
+    params: paramsType,
+    extension?: string
+): string => {
+    //Handling error for first argument.
     if (
-        typeof path === "object" &&
-        "params" in path &&
-        "slug" in path.params &&
-        (typeof path.params.slug === "object") === false
+        (typeof params === "object" &&
+            "slug" in params &&
+            Array.isArray(params.slug)) === false
     )
         throw Error(
-            "Error on calling 'generateRoute' method of 'next-dynamic-route-generator'. The first argument should be the object passed as parameter to 'getStaticProps' without any changing or destructuring. Moreover, on getStaticPaths you should generate the 'paths' key by 'getRoute'."
+            "Error on calling 'generateRoute' method of 'next-dynamic-route-generator'. Pass the correct argument. Also on 'getStaticPaths' you should generate the 'paths' key using 'getRoute'."
         );
 
-    let route = path.params.slug.join("/");
+    /*
+    Here we are assuming the params is of 'paramsType' because a custom error is thrown for other types.
+    Though we couldn't check if all the elements of slug array is string. 
+    */
+    let route: string = "";
+    if (Array.isArray(params?.slug)) route = params?.slug?.join("/");
 
     //Handling error for second argument.
     if (extension !== undefined) {

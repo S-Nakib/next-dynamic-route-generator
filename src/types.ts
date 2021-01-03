@@ -1,10 +1,11 @@
-//pathType is the type 'path'.
-export type pathType = {
-    params: {
-        slug: string[];
-    };
+//paramsType is the type of 'params' key.
+export declare type paramsType = {
+    [name: string]: string | string[] | undefined;
 };
 
 //pathsType is the type of 'paths' key.
-
-export type pathsType = pathType[];
+export declare type pathsType = {
+    params: {
+        slug: string[];
+    };
+}[];
