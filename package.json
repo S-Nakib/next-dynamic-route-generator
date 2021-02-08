@@ -1,6 +1,6 @@
 {
     "name": "next-dynamic-route-generator",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "description": "See the README file",
     "main": "build/src/index.js",
     "scripts": {
