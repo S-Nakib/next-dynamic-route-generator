@@ -1,4 +1,4 @@
-![version2.0.0](https://img.shields.io/badge/version-2.0.0-green) ![contributions:welcome](https://img.shields.io/badge/contributions-welcome-red)
+![version2.0.0](https://img.shields.io/badge/version-3.0.0-green) ![License: MIT](https://img.shields.io/badge/license-MIT-blue) ![contributions:welcome](https://img.shields.io/badge/contributions-welcome-red)
 <br/>
 
 # Installation
@@ -29,7 +29,10 @@ From here we are assuming that you are familiar with `next.js`. You need not be 
 
 `route`: The url string. Such as `"about/about_me"`
 
-<h3 id="example">For example,</h3>
+`queryParam`: Dynamic routes can be extended to catch all paths by adding three dots (...) inside the brackets such as `pages/post/[...slug].js`. [See docs](https://nextjs.org/docs/routing/dynamic-routes#catch-all-routes).  
+Here `slug` is the queryParam. That means for dynamic routes, the name of the file without the brackets and 3 dots(...) is the `queryParam`.
+
+<h3 id="example">An example,</h3>
 
 Let you have created a `next.js` project to generate a static blog. It has a `posts` directory, which contains the blog posts as `.md` files.
 The project file structure is something like this. (You may replace the `.js` to `.ts` if you want)
@@ -57,28 +60,21 @@ your_domain/about
 So you need to use [getStaticPaths](https://nextjs.org/docs/basic-features/data-fetching#getstaticpaths-static-generation) to generate those paths statically.
 
 The returned object of the [getStaticPaths](https://nextjs.org/docs/basic-features/data-fetching#getstaticpaths-static-generation) must contain a key named as [paths](https://nextjs.org/docs/basic-features/data-fetching#the-paths-key-required). This key is an array defining the route/URL structure of the site. Since you want the route/URL structure to be the same as the `posts` directory structure, you need to pass the [paths](https://nextjs.org/docs/basic-features/data-fetching#the-paths-key-required) key accordingly.  
-And here comes `next-dynamic-route-generator` to rescue you. It provides a method `getPaths` which will generate the `paths` key for you. You just need to point out the directory where you have kept your contents and the file extension of your contents. This method is described [here](#getpaths).
+And here comes `next-dynamic-route-generator` to rescue you. It provides a method `getPaths` which will generate the `paths` key for you. This method is described [here](#getpaths).
 
 You will also need to work with [getStaticProps](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation) method. The `getStaticProps` method takes a parameter which has a [params](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation) key.
 
-From the params key you can get the current route and then fetch the contents(.md/.mdx or other files). Here also we have got your back. If the params key is not `undefined`, pass it to the `generateRoute` method and it will return the route string.
+From the `params` key you can get the current route and then fetch the contents(.md/.mdx or other files). Here also we have got your back. If the `params` key is not `undefined` then you can get the route by `generateRoute` method. This method is described [here](#generateroute).
 
-You can also pass an optional second argument string defining the extension of your files to get the route with the extension. This method is described [here](#generateroute).
-
-### By the way, to make `generateRoute` work on `getStaticProps`, you have to use `getPaths` on `getStaticPaths`.
+Sometimes you may have some routes and you want to generate `paths`. This is possible using `generatePaths` method. This method is described [here](#generatepaths)
 
 <br/><br/>
 
 <h1 id="setup"> Setup</h1>
 
 The [pages](https://nextjs.org/docs/basic-features/pages) directory is a special directory in `next.js`.
-Inside the `pages` directory create a `.js/.ts` file named as `[...slug].js/ts` . Here the `[]` and `...` have special meaning([see here](https://nextjs.org/docs/routing/dynamic-routes#catch-all-routes)).
-
-According to `next.js` documentation, you can use any identifier other than `slug`.
-
-### But remind, to use this package you must name this as `slug`. Otherwise, it won't work.
-
-Since we are using `slug` as the key on `paths`, the `generateRoute` will also check for `slug`, so to use `generateRoute` you must get the `paths` with `getPaths`.
+Inside the `pages` directory create a `.js/.ts` file named as `[...slug].js/ts` . Here the `[]` and `...` have special meaning([see here](https://nextjs.org/docs/routing/dynamic-routes#catch-all-routes)). The file name can be anything other than `[...slug]` such as `[...param]`, `[...a]` etc.
+If the filename is `[...slug].js/ts` then here queryParam is `slug`
 
 #### importing
 
@@ -88,45 +84,79 @@ import getPaths, { generateRoute } from "next-dynamic-route-generator";
 
 Now on the `[...slug].js/ts` file, `getStaticPaths` and `getStaticProps` are needed to be implemented.
 
-### Here, It is recommended to keep your contents(.md, .mdx, etc files) in one directory and to keep all the contents files with the same extension.
-
-That means the all the contents files should be either `.md` or `.mdx` or any other but don't mix two different extensions such as creating files with `.md` and `.mdx` both.  
-This will prevent duplication of elements of the `paths` key. But still, if you want to do otherwise then you will need to call `getPaths` more than once and handle duplication on your own.
-The static files which will not be converted to URL such as image, etc can have any extension since they will not generate any route.
-
 <br/><br/>
 
 <h1 id="getpaths">getPaths</h1>
 
-`getPaths` takes two string parameters. They are, the path of the directory from root where your posts or contents remain and the extension of the files you want to capture.
-For our previous [example](#example) it will be,
+`getPaths` takes an object as parameter. The keys are,
+
+`dirPath` (type: string, required): the path of the directory from root where your posts or contents remain and the extension of the files you want to capture.  
+On the previous example, it is `"../posts"`
+
+`queryParam` (type:string, required): The queryParam. For the previous example, it will be `"slug"`.
+
+`extension` (type:string, optional): The extension of the files we want to capture.  
+In the previous example, it is `".md"`.
+
+`globPattern` (type:string, optional): The glob pattern to match the files we want to capture.  
+On the previous example, it will be `"**/*.md"`.
+
+<b>Remind, `extension` and `globPattern` are optional individually. But you must pass at least one of them. </b>
+If both are passed the files will be captured according to `extension` key.
+
+So, For our previous [example](#example) it will
 
 ```typescript
-const paths = getPaths("posts", "md");
-```
-
-Here if we wanted the routes only for contents of `posts/javascript`, then it would be
-
-```typescript
-const paths = getPaths("posts/javascript", "md");
+const paths = getPaths({
+    dirPath: "../posts",
+    queryParam: "slug",
+    extension: ".md"
+});
 ```
 
 <br></br>
 
 <h1 id="generateroute">generateRoute</h1>
 
-If the `params` key exists on the paramater of `getStaticProps`, then pass the `params` key to the `generateRoute` method. It will return the `route` as a string. You can also pass an optional parameter extension to get the route with the extension. Without passing an extension, you will get the route without an extension.
+If the `params` key exists on the parameter of `getStaticProps` and it is an array of strings, then the corresponding route can be generated using `generateRoute` method. The `params` key will always be an array of strings if the paths were generated using getPaths.  
+It will return the `route` as a string.
+
+`generateRoute` also takes an object as parameter. The keys are,
+
+`params` (required): params key of the object that is passed on `getStaticProps`.[See here](https://nextjs.org/docs/basic-features/data-fetching#getstaticprops-static-generation)
+
+`queryParam` (type:string, required): The queryParam.
+
+`dirPath` (string, optional): If we want our route to contain the dirPath then we need to pass it.
+
+`extension` (string, optional): To get the route with extension pass one.
+
+`absolute` (boolean, optional): Pass true to get absolute route. `default` is `false`.
+
+So, For our previous [example](#example) it will be
 
 ```javascript
 export async function getStaticProps(context) {
     if (context.params) {
-        const route = generateRoute(data, "md");
+        const route = generateRoute({
+            params: context.params,
+            queryParam: "slug",
+            dirPath: "post,
+            extension: ".md",
+            absolute: true
+        });
     }
 }
 ```
 
+<h1 id="generatepaths">generatePaths</h1>
+
+This will simple take an object with two keys, they are `routes` and `queryParam`. Both are required.  
+`routes` is an array of strings containing routes.  
+It will return `paths` of those routes.
+
 ### Error handling
 
-The `getStaticPaths` and `getStaticProps` methods are called only at the time of building the static site. They are not something like `express.js`s middleware functions, which run for each API request.
-So, it is not suitable to catch the error and let it go. Rather the user/develper should be shown directly if anything wrong happens so that he can take measures and build the site perfectly.
+The `getStaticPaths` and `getStaticProps` methods are called only at the time of building the static site. They are not something like `express.js` middleware functions, which run for each API request.
+So, it is not suitable to catch the error and let it go. Rather the user/developer should be shown directly if anything wrong happens so that he can take measures and build the site perfectly.
 So, here we have validated the user input(method arguments) and thrown error with an error message so that the user can easily catch what has gone wrong.

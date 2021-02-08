@@ -4,7 +4,8 @@
     "description": "See the README file",
     "main": "build/src/index.js",
     "scripts": {
-        "test": "jest"
+        "test": "jest",
+        "tsc": "tsc -w"
     },
     "repository": {
         "type": "git",

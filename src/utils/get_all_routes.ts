@@ -1,28 +1,32 @@
-import glob from "glob";
-import fs from "fs";
 import path from "path";
+import { getPathsParamType } from "../types";
+import directoryValidator from "./directory_validator";
+import generateGlobPattern from "./generate_glob_pattern";
+import { readDirRecursive } from "./lib_methods";
+import { extensionRegex } from "../_globals";
 
-const getAllRoutes = (dir: string, extension: string): string[] => {
+const getAllRoutes = async (param: getPathsParamType): Promise<string[]> => {
+    const { dirPath } = param;
+
     /*
     next.js compiles code into a separate directory, so process.cwd() should be used instead of __dirname. (https://nextjs.org/docs/basic-features/data-fetching#reading-files-use-processcwd)
     */
-    const dirPath = path.join(process.cwd(), dir);
+    const absoluteDirPath = path.join(process.cwd(), dirPath);
 
-    if (fs.existsSync(dirPath) === false)
+    //It will throw an error with the error message if the directory is not accessible.
+    if (!(await directoryValidator(absoluteDirPath)))
         throw Error(
-            "Error on 'getPaths' method of 'next-dynamic-route-generator'. The directory that was passed as an argument doesn't exist."
+            //This method is called by 'getPaths' method which is invoked by the user.
+            "Error on 'getPaths' method of 'next-dynamic-route-generator'. Can not access the directory."
         );
 
-    //Handling mistaken extension argument with a dot(.).
-    extension = extension[0] === "." ? extension : "." + extension;
+    const globPattern = generateGlobPattern(param);
 
-    const extensionRegex = new RegExp(`${extension}$`);
-
-    const allRoutes = glob
-        //getting all the files route of given extension using glob(https://www.npmjs.com/package/glob)
-        .sync(`**/*${extension}`, { cwd: dirPath })
-        //removing extension
-        .map((filePath) => filePath.replace(extensionRegex, ""));
+    const allRoutes =
+        //getting all the files on the given directory path.
+        (await readDirRecursive(globPattern, { cwd: absoluteDirPath }))
+            //removing extension
+            .map((filePath) => filePath.replace(extensionRegex, ""));
 
     return allRoutes;
 };
